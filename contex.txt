@@ -1,0 +1,104 @@
+🧠 Project Description:
+Islambad Sentiment analysis
+ is a machine learning-powered mobile application that analyzes and visualizes public sentiments extracted from Google reviews of key public service categories — Hospitals, Malls, Restaurants, and Public Transport. The system is designed to provide users with an intuitive and informative interface to explore the best and worst-rated locations based on real-world customer feedback, using sentiment analysis and interactive visual tools.
+
+The project involves three major components:
+
+Data Collection & Preprocessing
+
+Model Training (Logistic Regression)
+
+Frontend (Flutter UI) + Backend (Flask API) integration for real-time predictions.
+
+🔧 Tech Stack:
+Frontend: Flutter (Material 3, v0.dev design)
+
+Backend: Flask (Python)
+
+ML Model: Logistic Regression with scikit-learn
+
+Vectorizer: TF-IDF Vectorizer (vectorizer.pkl)
+
+Data: Google Reviews (scraped and labeled)
+
+Storage: CSV Dataset (with scope for database integration)
+
+Mapping: Google Maps API
+
+Charts: Flutter chart libraries (Pie, Bar, Boxplots)
+
+📊 Dataset Features:
+categoryName: (Hospitals, Malls, etc.)
+
+location/lat, location/lang: Geocoordinates
+
+title: Name of the place
+
+stars: Google rating (1–5)
+
+avg_rating: Average rating from reviews
+
+cleaned_text: Preprocessed user review
+
+sentiment: Derived sentiment label (Positive, Neutral, Negative)
+
+🤖 Machine Learning Component:
+Approach: Supervised classification
+
+Model: Logistic Regression
+
+Training: Based on labeled sentiment using star ratings
+
+Output: Positive, Neutral, or Negative sentiment
+
+Use Case: Real-time prediction of new user-submitted reviews
+
+📱 App Features:
+🔵 Screen 1: Dashboard
+Sentiment distribution pie chart
+
+"Highlights" section showing:
+
+Top 5 and bottom 5 rated places for each category
+
+Sentiment emojis and average ratings
+
+🟢 Screen 2: Categories
+4 main category cards (Hospitals, Malls, Restaurants, Public Transport)
+
+Tap a category to see:
+
+Boxplot/bar chart of sentiment distribution across subcategories
+
+Top 5 / Bottom 5 locations
+
+Comparison tool: Select 2 locations and view side-by-side sentiment analysis
+
+🔴 Screen 3: Sentiment Map
+Interactive Google Map with colored pins:
+
+Green (Positive), Yellow (Neutral), Red (Negative)
+
+Clicking a pin shows:
+
+Title
+
+Sentiment label
+
+Star rating
+
+Category
+
+📝 Real-Time User Review Submission
+Users can choose a place and submit a custom review
+
+The backend:
+
+Vectorizes and predicts sentiment using the trained model
+
+Adds the new review to the dataset
+
+Updates the Dashboard and Map in near real-time
+
+Mimics real-world dynamic review behavior
+
