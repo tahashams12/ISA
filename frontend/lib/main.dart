@@ -7,6 +7,9 @@ import 'screens/about_screen.dart';
 import 'screens/settings_screen.dart';
 import 'providers/review_provider.dart';
 import 'screens/splash_screen.dart';
+import 'screens/comparison_screen.dart';
+
+import 'screens/sentiment_prediction_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -63,6 +66,8 @@ class _MainScreenState extends State<MainScreen> {
       DashboardScreen(),
       CategoriesScreen(),
       MapScreen(),
+      ComparisonScreen(),
+      SentimentPredictionScreen(),
     ];
 
     return Scaffold(
@@ -89,6 +94,16 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.map_outlined),
             selectedIcon: Icon(Icons.map),
             label: 'Map',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.compare_arrows_outlined),
+            selectedIcon: Icon(Icons.compare_arrows),
+            label: 'Compare',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.sentiment_satisfied_outlined),
+            selectedIcon: Icon(Icons.sentiment_satisfied),
+            label: 'Predict Sentiment',
           ),
         ],
       ),

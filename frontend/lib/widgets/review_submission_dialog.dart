@@ -37,25 +37,35 @@ class _ReviewSubmissionDialogState extends State<ReviewSubmissionDialog> {
                   Text(
                     'Submit a Review',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 24),
-                  
+
+                  // Place Selection
                   // Place Selection
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'Select Place',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.place),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                     ),
                     value: _selectedPlace,
+                    isExpanded:
+                        true, // This ensures the dropdown expands to full width
+                    icon: const Icon(Icons.arrow_drop_down,
+                        size: 24), // Smaller icon
                     items: provider.placeTitles.map((title) {
-                      return DropdownMenuItem(
+                      return DropdownMenuItem<String>(
                         value: title,
                         child: Text(
                           title,
                           overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(
+                              fontSize: 13), // Slightly smaller font
                         ),
                       );
                     }).toList(),
@@ -71,9 +81,9 @@ class _ReviewSubmissionDialogState extends State<ReviewSubmissionDialog> {
                       return null;
                     },
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Review Text
                   TextFormField(
                     controller: _reviewController,
@@ -94,17 +104,19 @@ class _ReviewSubmissionDialogState extends State<ReviewSubmissionDialog> {
                       return null;
                     },
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Action Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: _isSubmitting ? null : () {
-                          Navigator.of(context).pop();
-                        },
+                        onPressed: _isSubmitting
+                            ? null
+                            : () {
+                                Navigator.of(context).pop();
+                              },
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 12),
@@ -114,7 +126,8 @@ class _ReviewSubmissionDialogState extends State<ReviewSubmissionDialog> {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Text('Submit'),
                       ),

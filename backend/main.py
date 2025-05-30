@@ -36,10 +36,15 @@ class Review(BaseModel):
 class UserReview(BaseModel):
     placeTitle: str
     reviewText: str
+    
 
 class PredictionResponse(BaseModel):
     sentiment: str
     confidence: float
+
+class AltSentimentRequest(BaseModel):
+    text: str
+
 
 # Global variables to store data and model
 reviews_data = []
@@ -209,7 +214,7 @@ async def submit_review(user_review: UserReview):
             "latitude": place_info["latitude"],
             "longitude": place_info["longitude"],
             "title": user_review.placeTitle,
-            "stars": 3.0,  # Default rating for user reviews
+            "stars": 3.0,  # Default rating, can be adjusted
             "averageRating": place_info["averageRating"],  # Keep existing average
             "cleanedText": user_review.reviewText,
             "sentiment": predicted_sentiment
@@ -257,6 +262,17 @@ async def get_reviews_by_category(category: str):
     """Get reviews filtered by category"""
     filtered_reviews = [review for review in reviews_data if review["categoryName"] == category]
     return filtered_reviews
+
+
+@app.post("/predict-sentiment-alt", response_model=PredictionResponse)
+async def predict_sentiment_alternative(request: AltSentimentRequest):
+    try:
+        # You can modify this function if needed to use a different logic or model
+        sentiment, confidence = predict_sentiment(request.text)
+        return PredictionResponse(sentiment=sentiment, confidence=confidence)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error in alt sentiment prediction: {str(e)}")
+
 
 @app.get("/health")
 async def health_check():

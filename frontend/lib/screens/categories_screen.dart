@@ -55,7 +55,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ],
 
                 const SizedBox(height: 24),
-                _buildComparisonTool(provider),
+                // _buildComparisonTool(provider),
               ],
             ),
           );
@@ -81,24 +81,31 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            // Update the category card's column children
             children: [
               Text(
                 category,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
-              Text('${categoryReviews.length} reviews'),
+              Text(
+                '${categoryReviews.length} reviews',
+                style: const TextStyle(fontSize: 12),
+              ),
               const Spacer(),
-              Row(
+              // Wrap sentiment indicators in a flexible layout
+              Wrap(
+                spacing: 4, // Horizontal space between items
+                runSpacing: 4, // Vertical space between lines
                 children: [
                   _buildSentimentIndicator(
                       '😊', sentimentCounts['Positive'] ?? 0, Colors.green),
-                  const SizedBox(width: 8),
                   _buildSentimentIndicator(
                       '😐', sentimentCounts['Neutral'] ?? 0, Colors.orange),
-                  const SizedBox(width: 8),
                   _buildSentimentIndicator(
                       '😞', sentimentCounts['Negative'] ?? 0, Colors.red),
                 ],
@@ -146,37 +153,112 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
             // Sentiment Bar Chart
             SizedBox(
-              height: 200,
+              height: 220,
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
                   maxY: categoryReviews.length.toDouble(),
+                  gridData: FlGridData(
+                    horizontalInterval: categoryReviews.length / 5,
+                    drawVerticalLine: false,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: Colors.grey.withOpacity(0.2),
+                        strokeWidth: 1,
+                      );
+                    },
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border(
+                      bottom: BorderSide(
+                          color: Colors.grey.withOpacity(0.2), width: 1),
+                      left: BorderSide(
+                          color: Colors.grey.withOpacity(0.2), width: 1),
+                    ),
+                  ),
                   barGroups: _buildBarGroups(categoryReviews),
                   titlesData: FlTitlesData(
+                    show: true,
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
+                        reservedSize: 30,
                         getTitlesWidget: (value, meta) {
+                          const style = TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          );
+                          String text;
                           switch (value.toInt()) {
                             case 0:
-                              return const Text('Positive');
+                              text = 'Positive';
+                              break;
                             case 1:
-                              return const Text('Neutral');
+                              text = 'Neutral';
+                              break;
                             case 2:
-                              return const Text('Negative');
+                              text = 'Negative';
+                              break;
                             default:
-                              return const Text('');
+                              text = '';
+                              break;
                           }
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(text, style: style),
+                          );
                         },
                       ),
                     ),
                     leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: true),
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 35,
+                        interval: categoryReviews.length / 5,
+                        getTitlesWidget: (value, meta) {
+                          if (value == 0) return const SizedBox();
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: Text(
+                              value.toInt().toString(),
+                              style: const TextStyle(fontSize: 10),
+                              textAlign: TextAlign.right,
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     topTitles:
                         AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     rightTitles:
                         AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        String sentiment;
+                        switch (group.x.toInt()) {
+                          case 0:
+                            sentiment = 'Positive';
+                            break;
+                          case 1:
+                            sentiment = 'Neutral';
+                            break;
+                          case 2:
+                            sentiment = 'Negative';
+                            break;
+                          default:
+                            sentiment = '';
+                        }
+                        return BarTooltipItem(
+                          '$sentiment: ${rod.toY.toInt()}',
+                          const TextStyle(color: Colors.white),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -234,173 +316,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget _buildComparisonTool(ReviewProvider provider) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Comparison Tool',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Location 1',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: compareLocation1,
-                    items: provider.placeTitles.map((title) {
-                      return DropdownMenuItem(value: title, child: Text(title));
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        compareLocation1 = value;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Location 2',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: compareLocation2,
-                    items: provider.placeTitles.map((title) {
-                      return DropdownMenuItem(value: title, child: Text(title));
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        compareLocation2 = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            if (compareLocation1 != null && compareLocation2 != null) ...[
-              const SizedBox(height: 16),
-              _buildComparisonChart(provider),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildComparisonChart(ReviewProvider provider) {
-    final location1Reviews =
-        provider.reviews.where((r) => r.title == compareLocation1).toList();
-    final location2Reviews =
-        provider.reviews.where((r) => r.title == compareLocation2).toList();
-
-    final location1Sentiment = _getSentimentCounts(location1Reviews);
-    final location2Sentiment = _getSentimentCounts(location2Reviews);
-
-    return SizedBox(
-      height: 200,
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          barGroups: [
-            BarChartGroupData(
-              x: 0,
-              barRods: [
-                BarChartRodData(
-                  toY: (location1Sentiment['Positive'] ?? 0).toDouble(),
-                  color: Colors.green,
-                  width: 20,
-                ),
-              ],
-            ),
-            BarChartGroupData(
-              x: 1,
-              barRods: [
-                BarChartRodData(
-                  toY: (location2Sentiment['Positive'] ?? 0).toDouble(),
-                  color: Colors.green.withOpacity(0.7),
-                  width: 20,
-                ),
-              ],
-            ),
-            BarChartGroupData(
-              x: 2,
-              barRods: [
-                BarChartRodData(
-                  toY: (location1Sentiment['Neutral'] ?? 0).toDouble(),
-                  color: Colors.orange,
-                  width: 20,
-                ),
-              ],
-            ),
-            BarChartGroupData(
-              x: 3,
-              barRods: [
-                BarChartRodData(
-                  toY: (location2Sentiment['Neutral'] ?? 0).toDouble(),
-                  color: Colors.orange.withOpacity(0.7),
-                  width: 20,
-                ),
-              ],
-            ),
-            BarChartGroupData(
-              x: 4,
-              barRods: [
-                BarChartRodData(
-                  toY: (location1Sentiment['Negative'] ?? 0).toDouble(),
-                  color: Colors.red,
-                  width: 20,
-                ),
-              ],
-            ),
-            BarChartGroupData(
-              x: 5,
-              barRods: [
-                BarChartRodData(
-                  toY: (location2Sentiment['Negative'] ?? 0).toDouble(),
-                  color: Colors.red.withOpacity(0.7),
-                  width: 20,
-                ),
-              ],
-            ),
-          ],
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  switch (value.toInt()) {
-                    case 0:
-                    case 1:
-                      return const Text('Positive');
-                    case 2:
-                    case 3:
-                      return const Text('Neutral');
-                    case 4:
-                    case 5:
-                      return const Text('Negative');
-                    default:
-                      return const Text('');
-                  }
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildReviewTile(Review review, ReviewProvider provider) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -449,6 +364,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             toY: (sentimentCounts['Positive'] ?? 0).toDouble(),
             color: Colors.green,
             width: 40,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(3),
+              topRight: Radius.circular(3),
+            ),
           ),
         ],
       ),
@@ -459,6 +378,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             toY: (sentimentCounts['Neutral'] ?? 0).toDouble(),
             color: Colors.orange,
             width: 40,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(3),
+              topRight: Radius.circular(3),
+            ),
           ),
         ],
       ),
@@ -469,6 +392,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             toY: (sentimentCounts['Negative'] ?? 0).toDouble(),
             color: Colors.red,
             width: 40,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(3),
+              topRight: Radius.circular(3),
+            ),
           ),
         ],
       ),

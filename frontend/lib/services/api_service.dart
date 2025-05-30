@@ -60,6 +60,24 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> predictSentiment(String text) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/predict-sentiment-alt'), // <-- updated endpoint
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'text': text}), // matches AltSentimentRequest
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to predict sentiment: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error predicting sentiment: $e');
+    }
+  }
+
   Future<bool> checkHealth() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/health'));
