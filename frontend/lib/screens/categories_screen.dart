@@ -48,12 +48,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     return _buildCategoryCard(context, category, provider);
                   },
                 ),
-                
+
                 if (selectedCategory != null) ...[
                   const SizedBox(height: 24),
                   _buildCategoryDetails(provider),
                 ],
-                
+
                 const SizedBox(height: 24),
                 _buildComparisonTool(provider),
               ],
@@ -64,10 +64,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context, String category, ReviewProvider provider) {
+  Widget _buildCategoryCard(
+      BuildContext context, String category, ReviewProvider provider) {
     final categoryReviews = provider.getReviewsByCategory(category);
     final sentimentCounts = _getSentimentCounts(categoryReviews);
-    
+
     return Card(
       child: InkWell(
         onTap: () {
@@ -84,19 +85,22 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               Text(
                 category,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 8),
               Text('${categoryReviews.length} reviews'),
               const Spacer(),
               Row(
                 children: [
-                  _buildSentimentIndicator('😊', sentimentCounts['Positive'] ?? 0, Colors.green),
+                  _buildSentimentIndicator(
+                      '😊', sentimentCounts['Positive'] ?? 0, Colors.green),
                   const SizedBox(width: 8),
-                  _buildSentimentIndicator('😐', sentimentCounts['Neutral'] ?? 0, Colors.orange),
+                  _buildSentimentIndicator(
+                      '😐', sentimentCounts['Neutral'] ?? 0, Colors.orange),
                   const SizedBox(width: 8),
-                  _buildSentimentIndicator('😞', sentimentCounts['Negative'] ?? 0, Colors.red),
+                  _buildSentimentIndicator(
+                      '😞', sentimentCounts['Negative'] ?? 0, Colors.red),
                 ],
               ),
             ],
@@ -123,8 +127,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   Widget _buildCategoryDetails(ReviewProvider provider) {
     final categoryReviews = provider.getReviewsByCategory(selectedCategory!);
-    final topRated = categoryReviews..sort((a, b) => b.averageRating.compareTo(a.averageRating));
-    final bottomRated = List<Review>.from(categoryReviews)..sort((a, b) => a.averageRating.compareTo(b.averageRating));
+    final topRated =
+        provider.getTopRatedUniqueByCategory(selectedCategory!, limit: 5);
+    final bottomRated =
+        provider.getBottomRatedUniqueByCategory(selectedCategory!, limit: 5);
 
     return Card(
       child: Padding(
@@ -137,7 +143,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 16),
-            
+
             // Sentiment Bar Chart
             SizedBox(
               height: 200,
@@ -167,17 +173,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: true),
                     ),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   ),
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Top and Bottom Rated
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
@@ -185,13 +194,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     children: [
                       Text(
                         'Top 5 Rated',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 8),
-                      ...topRated.take(5).map((review) => _buildReviewTile(review, provider)),
+                      ...topRated
+                          .map((review) => _buildReviewTile(review, provider)),
                     ],
                   ),
                 ),
@@ -202,13 +213,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     children: [
                       Text(
                         'Bottom 5 Rated',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 8),
-                      ...bottomRated.take(5).map((review) => _buildReviewTile(review, provider)),
+                      // Display items directly without scrolling, same as Top 5
+                      ...bottomRated
+                          .map((review) => _buildReviewTile(review, provider)),
                     ],
                   ),
                 ),
@@ -232,7 +246,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 16),
-            
             Row(
               children: [
                 Expanded(
@@ -272,7 +285,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
               ],
             ),
-            
             if (compareLocation1 != null && compareLocation2 != null) ...[
               const SizedBox(height: 16),
               _buildComparisonChart(provider),
@@ -284,9 +296,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   Widget _buildComparisonChart(ReviewProvider provider) {
-    final location1Reviews = provider.reviews.where((r) => r.title == compareLocation1).toList();
-    final location2Reviews = provider.reviews.where((r) => r.title == compareLocation2).toList();
-    
+    final location1Reviews =
+        provider.reviews.where((r) => r.title == compareLocation1).toList();
+    final location2Reviews =
+        provider.reviews.where((r) => r.title == compareLocation2).toList();
+
     final location1Sentiment = _getSentimentCounts(location1Reviews);
     final location2Sentiment = _getSentimentCounts(location2Reviews);
 
@@ -426,7 +440,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   List<BarChartGroupData> _buildBarGroups(List<Review> reviews) {
     final sentimentCounts = _getSentimentCounts(reviews);
-    
+
     return [
       BarChartGroupData(
         x: 0,

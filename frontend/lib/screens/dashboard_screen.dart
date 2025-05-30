@@ -10,9 +10,26 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
+          title: const Text('Dashboard'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          actions: [
+            // About button
+            IconButton(
+              icon: const Icon(Icons.info_outline),
+              tooltip: 'About',
+              onPressed: () {
+                Navigator.of(context).pushNamed('/about');
+              },
+            ),
+            // Settings button
+            IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: 'Settings',
+              onPressed: () {
+                Navigator.of(context).pushNamed('/settings');
+              },
+            ),
+          ]),
       body: Consumer<ReviewProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
@@ -62,20 +79,20 @@ class DashboardScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _buildLegend(provider),
+                        //_buildLegend(provider),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Highlights Section
                 Text(
                   'Highlights',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 16),
-                
+
                 SizedBox(
                   height: 300,
                   child: ListView.builder(
@@ -108,14 +125,15 @@ class DashboardScreen extends StatelessWidget {
   List<PieChartSectionData> _buildPieChartSections(ReviewProvider provider) {
     final distribution = provider.sentimentDistribution;
     final total = distribution.values.fold(0, (sum, count) => sum + count);
-    
+
     if (total == 0) return [];
 
     return [
       PieChartSectionData(
         color: Colors.green,
         value: (distribution['Positive'] ?? 0).toDouble(),
-        title: '${((distribution['Positive'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+        title:
+            '${((distribution['Positive'] ?? 0) / total * 100).toStringAsFixed(1)}%',
         radius: 60,
         titleStyle: const TextStyle(
           fontSize: 12,
@@ -126,7 +144,8 @@ class DashboardScreen extends StatelessWidget {
       PieChartSectionData(
         color: Colors.orange,
         value: (distribution['Neutral'] ?? 0).toDouble(),
-        title: '${((distribution['Neutral'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+        title:
+            '${((distribution['Neutral'] ?? 0) / total * 100).toStringAsFixed(1)}%',
         radius: 60,
         titleStyle: const TextStyle(
           fontSize: 12,
@@ -137,7 +156,8 @@ class DashboardScreen extends StatelessWidget {
       PieChartSectionData(
         color: Colors.red,
         value: (distribution['Negative'] ?? 0).toDouble(),
-        title: '${((distribution['Negative'] ?? 0) / total * 100).toStringAsFixed(1)}%',
+        title:
+            '${((distribution['Negative'] ?? 0) / total * 100).toStringAsFixed(1)}%',
         radius: 60,
         titleStyle: const TextStyle(
           fontSize: 12,
@@ -152,9 +172,12 @@ class DashboardScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildLegendItem('Positive', Colors.green, provider.sentimentDistribution['Positive'] ?? 0),
-        _buildLegendItem('Neutral', Colors.orange, provider.sentimentDistribution['Neutral'] ?? 0),
-        _buildLegendItem('Negative', Colors.red, provider.sentimentDistribution['Negative'] ?? 0),
+        _buildLegendItem('Positive', Colors.green,
+            provider.sentimentDistribution['Positive'] ?? 0),
+        _buildLegendItem('Neutral', Colors.orange,
+            provider.sentimentDistribution['Neutral'] ?? 0),
+        _buildLegendItem('Negative', Colors.red,
+            provider.sentimentDistribution['Negative'] ?? 0),
       ],
     );
   }

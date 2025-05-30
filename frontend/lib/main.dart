@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/categories_screen.dart';
 import 'screens/map_screen.dart';
+import 'screens/about_screen.dart';
+import 'screens/settings_screen.dart';
 import 'providers/review_provider.dart';
-import 'services/api_service.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,7 +26,11 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
         ),
-        home: MainScreen(),
+        home: SplashScreen(nextScreen: MainScreen()),
+        routes: {
+          '/about': (context) => const AboutScreen(),
+          '/settings': (context) => const SettingsScreen(),
+        },
         debugShowCheckedModeBanner: false,
       ),
     );
@@ -38,12 +44,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  
-  final List<Widget> _screens = [
-    DashboardScreen(),
-    CategoriesScreen(),
-    MapScreen(),
-  ];
 
   @override
   void initState() {
@@ -56,8 +56,17 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Create a modified dashboard with About and Settings buttons
+
+    // List of screens with the custom dashboard
+    final List<Widget> screens = [
+      DashboardScreen(),
+      CategoriesScreen(),
+      MapScreen(),
+    ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {

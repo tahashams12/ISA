@@ -4,7 +4,7 @@ import '../models/review_model.dart';
 
 class ApiService {
   static const String baseUrl =
-      'http://localhost:8000'; // Change to your backend URL
+      'http://192.168.18.80:8000'; // Change to your backend URL
 
   static Future<List<Review>> getReviews() async {
     try {
@@ -57,6 +57,16 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Error fetching sentiment distribution: $e');
+    }
+  }
+
+  Future<bool> checkHealth() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/health'));
+      return response.statusCode == 200;
+    } catch (e) {
+      print('API Health check error: $e');
+      return false;
     }
   }
 }
